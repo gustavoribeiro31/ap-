@@ -289,7 +289,7 @@
 <body>
 
     <header>
-        <h1>Gestão de Tarefas Domésticas v6</h1>
+        <h1>Gestão de Tarefas Domésticas v7</h1>
     </header>
 
     <div class="status-banco" id="statusBancoMonitor">🌐 Status de Rede: Buscando conexão com Firebase...</div>
@@ -448,6 +448,7 @@
             event.currentTarget.classList.add('active');
         }
 
+        // Monitor do Firebase Blindado contra Listas Vazias
         db.ref("dadosApartamento").on("value", (snapshot) => {
             document.getElementById("statusBancoMonitor").innerHTML = "🟢 Conectado na Nuvem: Sincronização em tempo real ativa.";
             document.getElementById("statusBancoMonitor").style.backgroundColor = "#f0fff4";
@@ -459,6 +460,7 @@
                 dadosApp = dadosNuvem;
                 dadosApp.usuarioLogado = userAtualLocal;
 
+                // SOLUÇÃO DO BUG: Se o nó principal existe na nuvem mas a lista semanal veio nula ou vazia, força o sorteio
                 if (!dadosApp.tarefasFixasSemana || dadosApp.tarefasFixasSemana.length === 0) {
                     gerarNovaEscalaSemanal();
                     db.ref("dadosApartamento").set(dadosApp);
@@ -655,7 +657,7 @@
             reader.readAsDataURL(fileInput.files[0]);
         }
 
-        // CORREÇÃO CRÍTICA DO TYPO DA VARIÁVEL PONTOS FINAIS AQUI
+        // CORREÇÃO DEFINITIVA DA VARIÁVEL DE PONTUAÇÃO BASE DESTA FUNÇÃO
         function votarAprovarTarefa(index) {
             let t = dadosApp.tarefasFixasSemana[index];
             if (!t.votosAprovados) t.votosAprovados = [];
