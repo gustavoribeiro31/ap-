@@ -28,14 +28,25 @@
 
         header h1 {
             color: #0b1a30;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 600;
             letter-spacing: -0.5px;
         }
 
+        /* CARD DE DIAGNÓSTICO DO BANCO */
+        .status-banco {
+            text-align: center;
+            padding: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background-color: #edf2f7;
+            color: #4a5568;
+            border-bottom: 1px solid #cbd5e0;
+        }
+
         .login-banner {
             background-color: #e9f0f8;
-            padding: 12px;
+            padding: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -44,24 +55,23 @@
         }
 
         .login-banner span {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #4a5568;
             font-weight: 500;
         }
 
         .login-banner select {
             width: auto;
-            margin-bottom: 0;
-            padding: 6px 16px;
+            padding: 4px 12px;
             background-color: #ffffff;
             color: #0066cc;
             font-weight: 600;
             border: 1px solid #0066cc;
             border-radius: 6px;
             cursor: pointer;
+            font-size: 0.85rem;
         }
 
-        /* MENU SUPERIOR CLEAN */
         .nav-tabs {
             display: flex;
             justify-content: center;
@@ -111,7 +121,7 @@
         }
 
         .card h2 {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             color: #0b1a30;
             font-weight: 600;
             margin-bottom: 15px;
@@ -193,16 +203,13 @@
         }
 
         .btn:hover { background-color: #0052cc; }
-        .btn-concluir { background-color: #0066cc; color: #ffffff; }
+        .btn-concluir { background-color: #0066cc; color: #ffffff; width: 100%; }
         .btn-aprovar { background-color: #2db360; color: #ffffff; font-size: 0.8rem; padding: 6px 12px; }
-        .btn-aprovar:hover { background-color: #249e4c; }
         .btn-rejeitar { background-color: #e53e3e; color: #ffffff; font-size: 0.8rem; padding: 6px 12px; }
-        .btn-rejeitar:hover { background-color: #c53030; }
         .btn-status { background-color: #edf2f7; color: #718096; cursor: default; font-size: 0.8rem; border: 1px solid #e2e8f0; }
         .btn-perigo { background-color: #e53e3e; color: #ffffff; }
         .btn-perigo:hover { background-color: #c53030; }
         .btn-lupa { background-color: #4a5568; color: #ffffff; font-size: 0.8rem; padding: 6px 12px; }
-        .btn-lupa:hover { background-color: #2d3748; }
 
         input, textarea, select {
             width: 100%;
@@ -276,7 +283,6 @@
             box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
             text-align: center;
         }
-        .modal-content h3 { font-size: 1.1rem; color: #0b1a30; margin-bottom: 12px; }
         .modal-content img {
             max-width: 100%;
             max-height: 50vh;
@@ -290,8 +296,10 @@
 <body>
 
     <header>
-        <h1>Gestão de Tarefas Domésticas v5</h1>
+        <h1>Gestão de Tarefas Domésticas</h1>
     </header>
+
+    <div class="status-banco" id="statusBancoMonitor">🌐 Status de Rede: Buscando conexão com Firebase...</div>
 
     <div class="login-banner">
         <span>Painel de:</span>
@@ -402,6 +410,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
+        // CONFIGURAÇÃO CONECTADA DO SEU BANCO DO FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyCcMGpAGObdMB7t6TWCvnLJnpZKMsUsRtA",
             authDomain: "tarefas-2a8f5.firebaseapp.com",
@@ -412,10 +421,19 @@
             appId: "1:64866675028:web:a177d2ad16746e049fc0c1"
         };
         
-        firebase.initializeApp(firebaseConfig);
+        // Tentativa de Inicialização com bloco Try/Catch para capturar erros de chave vazada
+        try {
+            firebase.initializeApp(firebaseConfig);
+        } catch (err) {
+            document.getElementById("statusBancoMonitor").innerHTML = "❌ Erro Crítico: Falha ao inicializar SDK do Firebase. Verifique sua apiKey.";
+            document.getElementById("statusBancoMonitor").style.backgroundColor = "#fff5f5";
+            document.getElementById("statusBancoMonitor").style.color = "#c53030";
+        }
+        
         const db = firebase.database();
 
-        let dadosApp = {
+        // Estrutura inicial mestre de fallback
+        const dadosAppPadrao = {
             moradores: ["Gustavo", "Rodrigo", "Danilo"],
             pontos: { "Gustavo": 0, "Rodrigo": 0, "Danilo": 0 },
             historicoSemanasSemFazer: { "Gustavo": 0, "Rodrigo": 0, "Danilo": 0 },
@@ -437,6 +455,8 @@
             controleAlternancia: true
         };
 
+        let dadosApp = JSON.parse(JSON.stringify(dadosAppPadrao));
+
         function alternarAba(event, abaId) {
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             document.querySelectorAll('.tab-link').forEach(tab => tab.classList.remove('active'));
@@ -445,16 +465,29 @@
             event.currentTarget.classList.add('active');
         }
 
+        // Ouvinte em tempo real corrigido e monitorado
         db.ref("dadosApartamento").on("value", (snapshot) => {
+            document.getElementById("statusBancoMonitor").innerHTML = "🟢 Conectado na Nuvem: Sincronização em tempo real ativa.";
+            document.getElementById("statusBancoMonitor").style.backgroundColor = "#f0fff4";
+            document.getElementById("statusBancoMonitor").style.color = "#22543d";
+            
             let dadosNuvem = snapshot.val();
             if (dadosNuvem) {
                 let userAtualLocal = dadosApp.usuarioLogado;
                 dadosApp = dadosNuvem;
                 dadosApp.usuarioLogado = userAtualLocal;
             } else {
+                // Se o banco retornar nulo ou não existir, injeta o padrão na hora
+                dadosApp = JSON.parse(JSON.stringify(dadosAppPadrao));
+                gerarNovaEscalaSemanal();
                 db.ref("dadosApartamento").set(dadosApp);
             }
             atualizarInterfaceCompleta();
+        }, (error) => {
+            // Captura o erro do print se as regras de segurança barrarem o tráfego
+            document.getElementById("statusBancoMonitor").innerHTML = "❌ Erro de Permissão do Firebase: " + error.message;
+            document.getElementById("statusBancoMonitor").style.backgroundColor = "#fff5f5";
+            document.getElementById("statusBancoMonitor").style.color = "#c53030";
         });
 
         function sincronizarNuvem() {
@@ -585,7 +618,7 @@
                              <span style="color:#b7791f; font-size:0.8rem; font-weight:600;">Votos recebidos: ${numVotos}/2</span>
                         </div>
                         <div class="tarefa-footer" style="border-top: 1px solid #e2e8f0;">
-                            <span class="pts-badge" style="color:#b7791f; background-color:rgba(183,121,31,0.1)">Vale: ${tf.pontosBase} Pts</span>
+                            <span class="pts-badge">Vale: ${tf.pontosBase} Pts</span>
                             <div style="display:flex; gap:5px;">
                                 ${jaVotou ? `<span style="color:#718096; font-size:0.8rem; font-style:italic; padding:6px;">Você já votou</span>` : `
                                 <button class="btn btn-aprovar" onclick="votarAprovarTarefa(${indexGlobal})">Aprovar</button>
@@ -600,7 +633,7 @@
 
         function salvarConfigTarefaCatalogo() {
             let nome = document.getElementById("cfgNomeTarefa").value.trim();
-            let pontos = parseInt(document.getElementById("cfgPointsTarefa") ? document.getElementById("cfgPointsTarefa").value : document.getElementById("cfgPontosTarefa").value);
+            let pontos = parseInt(document.getElementById("cfgPontosTarefa").value);
             let freq = document.getElementById("cfgFreqTarefa").value;
 
             if(!nome || isNaN(pontos)) return alert("Preencha os campos da tarefa.");
@@ -616,42 +649,10 @@
             }
 
             document.getElementById("cfgNomeTarefa").value = "";
-            if(document.getElementById("cfgPontosTarefa")) document.getElementById("cfgPontosTarefa").value = "";
+            document.getElementById("cfgPontosTarefa").value = "";
             
             alert("Tarefa salva no catálogo!");
             sincronizarNuvem();
-        }
-
-        function gerarNovaEscalaSemanal() {
-            if (!dadosApp.moradores || dadosApp.moradores.length === 0) return;
-            let ativasDaVez = dadosApp.catalogoTarefas.filter(t => t.frequencia === "toda" || dadosApp.controleAlternancia);
-            dadosApp.controleAlternancia = !dadosApp.controleAlternancia;
-            
-            let novaLista = [];
-            let moradoresDisponiveis = [...dadosApp.moradores];
-            let indiceMorador = 0;
-
-            ativasDaVez.forEach(t => {
-                let resp = moradoresDisponiveis[indiceMorador % moradoresDisponiveis.length];
-                if (dadosApp.escalaAnterior && dadosApp.escalaAnterior[resp] === t.id && moradoresDisponiveis.length > 1) {
-                    indiceMorador++;
-                    resp = moradoresDisponiveis[indiceMorador % moradoresDisponiveis.length];
-                }
-
-                novaLista.push({
-                    id: t.id + "_" + new Date().getTime() + "_" + Math.floor(Math.random() * 100),
-                    id_base: t.id,
-                    nome: t.nome,
-                    pontosBase: t.pontos,
-                    responsavel: resp,
-                    status: "pendente",
-                    foto: null,
-                    votosAprovados: [],
-                    dataGerada: new Date().getTime()
-                });
-                indiceMorador++;
-            });
-            dadosApp.tarefasFixasSemana = novaLista;
         }
 
         function submeterTarefaParaAnalise(index) {
@@ -719,8 +720,7 @@
                     responsavel: morador,
                     status: "analise",
                     foto: reader.result,
-                    votosAprovados: [],
-                    dataGerada: new Date().getTime()
+                    votosAprovados: []
                 });
 
                 document.getElementById("txtManualTarefa").value = "";
@@ -730,6 +730,42 @@
                 sincronizarNuvem();
             };
             reader.readAsDataURL(fileInput.files[0]);
+        }
+
+        function gerarNovaEscalaSemanal() {
+            dadosApp.tarefasFixasSemana = [];
+            let tarefasParaDividir = dadosApp.catalogoTarefas.filter(t => {
+                if (t.frequencia === "toda") return true;
+                return dadosApp.controleAlternancia;
+            });
+
+            dadosApp.controleAlternancia = !dadosApp.controleAlternancia;
+            let copiaMoradores = [...dadosApp.moradores];
+            let indexMorador = 0;
+
+            tarefasParaDividir.sort(() => Math.random() - 0.5);
+
+            tarefasParaDividir.forEach((task) => {
+                if (copiaMoradores.length === 0) copiaMoradores = [...dadosApp.moradores];
+                let responsavel = copiaMoradores[indexMorador % copiaMoradores.length];
+                
+                if (dadosApp.escalaAnterior && dadosApp.escalaAnterior[responsavel] === task.id && copiaMoradores.length > 1) {
+                    let alternativos = copiaMoradores.filter(m => m !== responsavel);
+                    responsavel = alternativos[Math.floor(Math.random() * alternativos.length)];
+                }
+
+                dadosApp.tarefasFixasSemana.push({
+                    id: task.id + "_" + new Date().getTime() + "_" + Math.floor(Math.random()*100),
+                    id_base: task.id,
+                    nome: task.nome,
+                    pontosBase: task.pontos,
+                    responsavel: responsavel,
+                    status: "pendente",
+                    foto: null,
+                    votosAprovados: []
+                });
+                copiaMoradores = copiaMoradores.filter(m => m !== responsavel);
+            });
         }
 
         function virarSemanaOficial() {
