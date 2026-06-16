@@ -207,7 +207,6 @@
         .btn-rejeitar { background-color: #e53e3e; color: #ffffff; font-size: 0.8rem; padding: 6px 12px; }
         .btn-status { background-color: #edf2f7; color: #718096; cursor: default; font-size: 0.8rem; border: 1px solid #e2e8f0; }
         .btn-perigo { background-color: #e53e3e; color: #ffffff; }
-        .btn-perigo:hover { background-color: #c53030; }
         .btn-lupa { background-color: #4a5568; color: #ffffff; font-size: 0.8rem; padding: 6px 12px; }
 
         input, textarea, select {
@@ -289,10 +288,10 @@
 <body>
 
     <header>
-        <h1>Gestão de Tarefas Domésticas v7</h1>
+        <h1>Gestão de Tarefas Domésticas v8</h1>
     </header>
 
-    <div class="status-banco" id="statusBancoMonitor">🌐 Status de Rede: Buscando conexão com Firebase...</div>
+    <div class="status-banco" id="statusBancoMonitor">🌐 Status de Rede: Sincronizando com Firebase...</div>
 
     <div class="login-banner">
         <span>Painel de:</span>
@@ -308,6 +307,7 @@
 
     <div class="container">
         
+        <!-- ABA 1: MINHAS OBRIGAÇÕES E CADASTRO MANUAL -->
         <div id="aba-obrigacoes" class="tab-content active">
             <div class="card">
                 <h2>Obrigações da Semana <button class="btn" style="font-size: 0.75rem; padding: 5px 10px;" onclick="virarSemanaOficial()">Virar Ciclo (Quarta)</button></h2>
@@ -327,6 +327,7 @@
             </div>
         </div>
 
+        <!-- ABA 2: CENTRAL DE VOTOS -->
         <div id="aba-votos" class="tab-content">
             <div class="card" style="border-top: 3px solid #dd6b20;">
                 <h2 style="color: #b7791f;">Aprovações Pendentes</h2>
@@ -334,6 +335,7 @@
             </div>
         </div>
 
+        <!-- ABA 3: RANKING & MURAL -->
         <div id="aba-ranking" class="tab-content">
             <div class="card">
                 <h2>Ranking do Mês</h2>
@@ -346,6 +348,7 @@
             </div>
         </div>
 
+        <!-- ABA 4: CONFIGURAÇÕES E REGRAS -->
         <div id="aba-config" class="tab-content">
             <div class="card">
                 <h2>Gerenciar Moradores</h2>
@@ -390,6 +393,7 @@
 
     </div>
 
+    <!-- MODAL DE INSPEÇÃO -->
     <div class="modal-overlay" id="modalFotoOverlay">
         <div class="modal-content">
             <h3>Inspeção de Comprovação</h3>
@@ -446,11 +450,12 @@
             
             document.getElementById(abaId).classList.add('active');
             event.currentTarget.classList.add('active');
+            atualizarInterfaceCompleta();
         }
 
-        // Monitor do Firebase Blindado contra Listas Vazias
+        // Sincronização e escuta da nuvem Firebase em tempo real
         db.ref("dadosApartamento").on("value", (snapshot) => {
-            document.getElementById("statusBancoMonitor").innerHTML = "🟢 Conectado na Nuvem: Sincronização em tempo real ativa.";
+            document.getElementById("statusBancoMonitor").innerHTML = "🟢 Conectado na Nuvem: Banco sincronizado em tempo real.";
             document.getElementById("statusBancoMonitor").style.backgroundColor = "#f0fff4";
             document.getElementById("statusBancoMonitor").style.color = "#22543d";
 
@@ -460,7 +465,7 @@
                 dadosApp = dadosNuvem;
                 dadosApp.usuarioLogado = userAtualLocal;
 
-                // SOLUÇÃO DO BUG: Se o nó principal existe na nuvem mas a lista semanal veio nula ou vazia, força o sorteio
+                // Força o sorteio se o nó existir no Firebase mas a lista semanal estiver limpa ou nula
                 if (!dadosApp.tarefasFixasSemana || dadosApp.tarefasFixasSemana.length === 0) {
                     gerarNovaEscalaSemanal();
                     db.ref("dadosApartamento").set(dadosApp);
@@ -487,6 +492,7 @@
         }
 
         function atualizarInterfaceCompleta() {
+            // 1. Dropdown do Banner de Perfil
             let selectU = document.getElementById("selectUsuarioLogado");
             let usuarioAnterior = dadosApp.usuarioLogado;
             selectU.innerHTML = "";
@@ -504,6 +510,7 @@
                 }
             }
 
+            // 2. Ranking Geral
             let placar = document.getElementById("placarRanking");
             placar.innerHTML = "";
             let ordenados = Object.keys(dadosApp.pontos || {}).sort((a,b) => dadosApp.pontos[b] - dadosApp.pontos[a]);
@@ -515,6 +522,7 @@
                     </div>`;
             });
 
+            // 3. Listagem de Moradores na Configuração
             let containerConfigMoradores = document.getElementById("listaMoradoresConfig");
             containerConfigMoradores.innerHTML = "";
             (dadosApp.moradores || []).forEach(nome => {
@@ -525,6 +533,7 @@
                     </div>`;
             });
 
+            // 4. Tabela de Regulamento Dinâmico
             let corpoTabela = document.getElementById("corpoTabelaRegras");
             corpoTabela.innerHTML = "";
             (dadosApp.catalogoTarefas || []).forEach(t => {
@@ -537,6 +546,7 @@
             });
             corpoTabela.innerHTML += `<tr><td style="color:#b7791f">Tarefa Manual Extra</td><td>10 pts</td><td>Avulsa</td></tr>`;
 
+            // 5. OBRIGAÇÕES EXCLUSIVAS DO USUÁRIO SELECIONADO
             let containerTarefas = document.getElementById("listaTarefasSemana");
             containerTarefas.innerHTML = "";
             let minhasObrigacoes = (dadosApp.tarefasFixasSemana || []).filter(t => t.responsavel === dadosApp.usuarioLogado);
@@ -579,6 +589,7 @@
                     </div>`;
             });
 
+            // 6. FILA DE APROVAÇÕES PENDENTES DOS AMIGOS
             let containerAprovacoes = document.getElementById("listaAprovacoesPendentes");
             containerAprovacoes.innerHTML = "";
             let filaParaVotar = (dadosApp.tarefasFixasSemana || []).filter(t => t.status === "analise" && t.responsavel !== dadosApp.usuarioLogado);
@@ -657,7 +668,6 @@
             reader.readAsDataURL(fileInput.files[0]);
         }
 
-        // CORREÇÃO DEFINITIVA DA VARIÁVEL DE PONTUAÇÃO BASE DESTA FUNÇÃO
         function votarAprovarTarefa(index) {
             let t = dadosApp.tarefasFixasSemana[index];
             if (!t.votosAprovados) t.votosAprovados = [];
@@ -753,6 +763,7 @@
                     votosAprovados: []
                 });
                 copiaMoradores = copiaMoradores.filter(m => m !== responsavel);
+                indexMorador++;
             });
         }
 
