@@ -202,6 +202,9 @@
         }
 
         .btn:hover { background-color: #0052cc; }
+        .btn-concluir { background-color: #0066cc; color: #ffffff; width: 100%; }
+        .btn-aprovar { background-color: #2db360; color: #ffffff; font-size: 0.8rem; padding: 6px 12px; }
+        .btn-rejeitar { background-color: #e53e3e; color: #ffffff; font-size: 0.8rem; padding: 6px 12px; }
         .btn-status { background-color: #edf2f7; color: #718096; cursor: default; font-size: 0.8rem; border: 1px solid #e2e8f0; }
         .btn-perigo { background-color: #e53e3e; color: #ffffff; }
         .btn-perigo:hover { background-color: #c53030; }
@@ -305,7 +308,6 @@
 
     <div class="container">
         
-        <!-- ABA 1: MINHAS OBRIGAÇÕES E CADASTRO MANUAL -->
         <div id="aba-obrigacoes" class="tab-content active">
             <div class="card">
                 <h2>Obrigações da Semana <button class="btn" style="font-size: 0.75rem; padding: 5px 10px;" onclick="virarSemanaOficial()">Virar Ciclo (Quarta)</button></h2>
@@ -325,7 +327,6 @@
             </div>
         </div>
 
-        <!-- ABA 2: CENTRAL DE VOTOS -->
         <div id="aba-votos" class="tab-content">
             <div class="card" style="border-top: 3px solid #dd6b20;">
                 <h2 style="color: #b7791f;">Aprovações Pendentes</h2>
@@ -333,7 +334,6 @@
             </div>
         </div>
 
-        <!-- ABA 3: RANKING & MURAL -->
         <div id="aba-ranking" class="tab-content">
             <div class="card">
                 <h2>Ranking do Mês</h2>
@@ -346,7 +346,6 @@
             </div>
         </div>
 
-        <!-- ABA 4: CONFIGURAÇÕES E REGRAS -->
         <div id="aba-config" class="tab-content">
             <div class="card">
                 <h2>Gerenciar Moradores</h2>
@@ -391,7 +390,6 @@
 
     </div>
 
-    <!-- MODAL DE INSPEÇÃO -->
     <div class="modal-overlay" id="modalFotoOverlay">
         <div class="modal-content">
             <h3>Inspeção de Comprovação</h3>
@@ -450,7 +448,6 @@
             event.currentTarget.classList.add('active');
         }
 
-        // Ouvinte reativo principal com verificação automática de nós vazios
         db.ref("dadosApartamento").on("value", (snapshot) => {
             document.getElementById("statusBancoMonitor").innerHTML = "🟢 Conectado na Nuvem: Sincronização em tempo real ativa.";
             document.getElementById("statusBancoMonitor").style.backgroundColor = "#f0fff4";
@@ -462,7 +459,6 @@
                 dadosApp = dadosNuvem;
                 dadosApp.usuarioLogado = userAtualLocal;
 
-                // CORREÇÃO CRÍTICA: Se o nó principal existe mas a lista de tarefas semanais sumiu ou foi deletada por acidente
                 if (!dadosApp.tarefasFixasSemana || dadosApp.tarefasFixasSemana.length === 0) {
                     gerarNovaEscalaSemanal();
                     db.ref("dadosApartamento").set(dadosApp);
@@ -659,6 +655,7 @@
             reader.readAsDataURL(fileInput.files[0]);
         }
 
+        // CORREÇÃO CRÍTICA DO TYPO DA VARIÁVEL PONTOS FINAIS AQUI
         function votarAprovarTarefa(index) {
             let t = dadosApp.tarefasFixasSemana[index];
             if (!t.votosAprovados) t.votosAprovados = [];
