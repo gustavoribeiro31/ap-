@@ -318,7 +318,7 @@
                 
                 <div style="margin-bottom: 20px;">
                     <h3 style="font-size: 0.95rem; margin-bottom: 10px; color:#0b1a30;">Gerenciar Moradores</h3>
-                    <div id="listaMoradoresConfig" style="margin-bottom: 10px;"></div>
+                    <div id="listaMoradoresConfig" style="margin-bottom: 10px; display: flex; flex-direction: column; gap: 5px;"></div>
                     <div style="display: flex; gap: 5px;">
                         <input type="text" id="txtNovoMorador" placeholder="Nome do integrante" style="margin-bottom:0;">
                         <button class="btn" onclick="cadastrarMorador()">Adicionar</button>
@@ -354,12 +354,11 @@
                     <ul>
                         <li><b>Upload Exigido:</b> O sistema bloqueia a submissão se não houver foto provando a limpeza.</li>
                         <li><b>Aprovação por Consenso (Voto Duplo):</b> Uma tarefa necessita do voto de aprovação de <b>pelo menos 2 moradores</b> para computar os pontos. Você nunca pode votar na sua própria tarefa.</li>
-                        <li><b>Cálculo de Agilidade (+15 pts):</b> Concluir a tarefa em até <b>5 dias</b> do ciclo (de quarta até segunda à noite). Se a tarefa for aprovada por consenso, o bônus de 15 pontos é somado automaticamente.</li>
                         <li><b>Punição Antiacúmulo:</b> Ficar 2 semanas seguidas sem concluir nada limpa os pontos da sua última tarefa feita no mês corrente.</li>
                     </ul>
                     <table class="tabela-regras">
                         <thead>
-                            <tr><th>Tarefa Fixa</th><th>Base</th><th>Com Agilidade</th><th>Freq.</th></tr>
+                            <tr><th>Tarefa Fixa</th><th>Pontuação</th><th>Freq.</th></tr>
                         </thead>
                         <tbody id="corpoTabelaRegras">
                             </tbody>
@@ -385,7 +384,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
-        // CONFIGURAÇÃO REAL DO SEU BANCO DO FIREBASE (ATUALIZADA)
+        // CONFIGURAÇÃO CONECTADA DO SEU BANCO DO FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyCcMGpAGObdMB7t6TWCvnLJnpZKMsUsRtA",
             authDomain: "tarefas-2a8f5.firebaseapp.com",
@@ -399,7 +398,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Estrutura mestre de inicialização
+        // Estrutura mestre de inicialização padrão
         let dadosApp = {
             moradores: ["Gustavo", "Rodrigo", "Danilo"],
             pontos: { "Gustavo": 0, "Rodrigo": 0, "Danilo": 0 },
@@ -422,11 +421,14 @@
             controleAlternancia: true
         };
 
-        // Ouvinte em tempo real do Firebase
+        // Ouvinte em tempo real do Firebase (Sempre puxa a verdade da nuvem)
         db.ref("dadosApartamento").on("value", (snapshot) => {
             let dadosNuvem = snapshot.val();
             if (dadosNuvem) {
+                // Preserva o usuário selecionado no dispositivo local para não sobrescrever o dropdown
+                let userAtualLocal = dadosApp.usuarioLogado;
                 dadosApp = dadosNuvem;
+                dadosApp.usuarioLogado = userAtualLocal;
             } else {
                 db.ref("dadosApartamento").set(dadosApp);
             }
@@ -439,11 +441,29 @@
 
         function alterarUsuarioAtivo() {
             dadosApp.usuarioLogado = document.getElementById("selectUsuarioLogado").value;
-            sincronizarNuvem();
+            atualizarInterfaceCompleta();
         }
 
         function atualizarInterfaceCompleta() {
-            // 1. Ranking Geral
+            // 1. Atualizar e Preencher Dropdown de Seleção de Usuários
+            let selectU = document.getElementById("selectUsuarioLogado");
+            let usuarioAnterior = dadosApp.usuarioLogado;
+            selectU.innerHTML = "";
+            
+            if (dadosApp.moradores && dadosApp.moradores.length > 0) {
+                dadosApp.moradores.forEach(nome => {
+                    selectU.innerHTML += `<option value="${nome}">${nome}</option>`;
+                });
+                if (dadosApp.moradores.includes(usuarioAnterior)) {
+                    selectU.value = usuarioAnterior;
+                    dadosApp.usuarioLogado = usuarioAnterior;
+                } else {
+                    dadosApp.usuarioLogado = dadosApp.moradores[0];
+                    selectU.value = dadosApp.moradores[0];
+                }
+            }
+
+            // 2. Ranking Geral
             let placar = document.getElementById("placarRanking");
             placar.innerHTML = "";
             let ordenados = Object.keys(dadosApp.pontos || {}).sort((a,b) => dadosApp.pontos[b] - dadosApp.pontos[a]);
@@ -455,36 +475,18 @@
                     </div>`;
             });
 
-            // 2. Aba de Moradores
-            let containerMoradores = document.getElementById("listaMoradoresAba");
+            // 3. Painel de Configuração dos Moradores (Listagem CRUD)
             let containerConfigMoradores = document.getElementById("listaMoradoresConfig");
-            containerMoradores.innerHTML = "";
             containerConfigMoradores.innerHTML = "";
             (dadosApp.moradores || []).forEach(nome => {
-                let blocoEl = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:6px 12px; margin-bottom:5px; border-radius:6px; font-size:0.9rem; border: 1px solid #e2e8f0;">
+                containerConfigMoradores.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:6px 12px; margin-radius:4px; font-size:0.9rem; border: 1px solid #e2e8f0;">
                         <span>${nome}</span>
                         <button class="btn btn-perigo" style="padding:2px 8px; font-size:0.7rem;" onclick="removerMorador('${nome}')">Remover</button>
                     </div>`;
-                containerMoradores.innerHTML += blocoEl;
-                containerConfigMoradores.innerHTML += blocoEl;
             });
 
-            // 3. Dropdown de Perfil
-            let selectU = document.getElementById("selectUsuarioLogado");
-            let usuarioAnterior = dadosApp.usuarioLogado;
-            selectU.innerHTML = "";
-            (dadosApp.moradores || []).forEach(nome => {
-                selectU.innerHTML += `<option value="${nome}">${nome}</option>`;
-            });
-            if((dadosApp.moradores || []).includes(usuarioAnterior)) {
-                selectU.value = usuarioAnterior;
-                dadosApp.usuarioLogado = usuarioAnterior;
-            } else {
-                dadosApp.usuarioLogado = dadosApp.moradores ? dadosApp.moradores[0] : "";
-            }
-
-            // 4. Tabela de Regulamento Dinâmico
+            // 4. Tabela de Regulamento Dinâmico (Sem Agilidade)
             let corpoTabela = document.getElementById("corpoTabelaRegras");
             corpoTabela.innerHTML = "";
             (dadosApp.catalogoTarefas || []).forEach(t => {
@@ -492,13 +494,12 @@
                     <tr>
                         <td>${t.nome}</td>
                         <td>${t.pontos} pts</td>
-                        <td style="color:#2db360; font-weight:600;">${t.pontos + 15} pts</td>
                         <td>${t.frequencia === 'toda' ? 'Toda semana' : '15 em 15 dias'}</td>
                     </tr>`;
             });
-            corpoTabela.innerHTML += `<tr><td style="color:#b7791f">Tarefa Manual Extra</td><td>10 pts</td><td style="color:#b7791f">Não tem</td><td>Avulsa</td></tr>`;
+            corpoTabela.innerHTML += `<tr><td style="color:#b7791f">Tarefa Manual Extra</td><td>10 pts</td><td>Avulsa</td></tr>`;
 
-            // 5. OBRIGAÇÕES EXCLUSIVAS DO PERFIL
+            // 5. OBRIGAÇÕES EXCLUSIVAS DO PERFIL ATIVO
             let containerTarefas = document.getElementById("listaTarefasSemana");
             containerTarefas.innerHTML = "";
             let minhasObrigacoes = (dadosApp.tarefasFixasSemana || []).filter(t => t.responsavel === dadosApp.usuarioLogado);
@@ -512,7 +513,7 @@
                 let interacaoGrid = "";
 
                 if (tf.status === "concluida") {
-                    interacaoGrid = `<button class="btn btn-status">Aprovado por Geral</button>`;
+                    interacaoGrid = `<button class="btn btn-status">✅ Aprovado por Geral</button>`;
                 } else if (tf.status === "analise") {
                     let numVotos = tf.votosAprovados ? tf.votosAprovados.length : 0;
                     interacaoGrid = `<span style="color:#b7791f; font-size:0.85rem; font-weight:600;">Enviada (${numVotos}/2 votos). Aguardando aprovação...</span>`;
@@ -660,11 +661,7 @@
             t.votosAprovados.push(dadosApp.usuarioLogado);
 
             if (t.votosAprovados.length >= 2) {
-                let agora = new Date();
-                let diffDias = Math.ceil(Math.abs(agora - new Date(t.dataGerada)) / (1000 * 60 * 60 * 24));
                 let pontosFinais = t.pontosBase;
-                if (diffDias <= 5) pontosFinais += 15;
-
                 dadosApp.pontos[t.responsavel] = (dadosApp.pontos[t.responsavel] || 0) + pontosFinais;
                 t.status = "concluida";
                 if(!dadosApp.ultimaTarefaFeita) dadosApp.ultimaTarefaFeita = {};
@@ -745,8 +742,11 @@
         function cadastrarMorador() {
             let nome = document.getElementById("txtNovoMorador").value.trim();
             if (!nome || dadosApp.moradores.includes(nome)) return;
+            if (!dadosApp.moradores) dadosApp.moradores = [];
             dadosApp.moradores.push(nome);
+            if (!dadosApp.pontos) dadosApp.pontos = {};
             dadosApp.pontos[nome] = 0;
+            if (!dadosApp.historicoSemanasSemFazer) dadosApp.historicoSemanasSemFazer = {};
             dadosApp.historicoSemanasSemFazer[nome] = 0;
             document.getElementById("txtNovoMorador").value = "";
             sincronizarNuvem();
