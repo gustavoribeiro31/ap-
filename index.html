@@ -184,7 +184,6 @@
         .btn-rejeitar:hover { background-color: #c53030; }
         .btn-status { background-color: #edf2f7; color: #718096; cursor: default; font-size: 0.8rem; border: 1px solid #e2e8f0; }
         .btn-perigo { background-color: #e53e3e; color: #ffffff; }
-        .btn-perigo:hover { background-color: #c53030; }
         .btn-lupa { background-color: #4a5568; color: #ffffff; font-size: 0.8rem; padding: 6px 12px; }
         .btn-lupa:hover { background-color: #2d3748; }
 
@@ -268,10 +267,7 @@
             border-radius: 6px;
             border: 1px solid #e2e8f0;
         }
-        .modal-fechar {
-            margin-top: 15px;
-            background-color: #4a5568;
-        }
+        .modal-fechar { margin-top: 15px; background-color: #4a5568; }
         .modal-fechar:hover { background-color: #2d3748; }
     </style>
 </head>
@@ -290,19 +286,16 @@
         
         <div class="col-principal" style="display: flex; flex-direction: column; gap: 20px;">
             
-            <!-- LISTA DE TAREFAS EXCLUSIVAS DO USUÁRIO -->
             <div class="card">
                 <h2>Obrigações da Semana <button class="btn" style="font-size: 0.75rem; padding: 5px 10px;" onclick="virarSemanaOficial()">Virar Ciclo (Quarta)</button></h2>
                 <div id="listaTarefasSemana"></div>
             </div>
 
-            <!-- CENTRAL DE VALIDAÇÃO DOS AMIGOS -->
             <div class="card" style="border-top: 3px solid #dd6b20;">
                 <h2 style="color: #b7791f;">Aprovações Pendentes</h2>
                 <div id="listaAprovacoesPendentes"></div>
             </div>
 
-            <!-- LANÇAR TAREFA MANUAL -->
             <div class="card">
                 <h2>Registrar Tarefa Manual Extra (10 Pts)</h2>
                 <div>
@@ -315,66 +308,70 @@
                 <button class="btn" style="width: 100%;" onclick="salvarTarefaManual()">Enviar para Fila de Votos</button>
             </div>
 
-            <!-- ACERTO DE CONTAS -->
             <div class="card">
                 <h2>Mural do Acerto de Contas do Mês</h2>
-                <textarea id="txtMuralAcordos" rows="3" placeholder="Ex: O lanterna paga a pizza e o campeão ganha fardo de cerveja..." oninput="salvarMural()"></textarea>
+                <textarea id="txtMuralAcordos" rows="3" placeholder="Ex: O lanterna paga a pizza..." oninput="salvarMural()"></textarea>
+            </div>
+
+            <div class="card" style="border-top: 3px solid #4a5568;">
+                <h2 style="color: #4a5568;">Painel de Configuração do Sistema</h2>
+                
+                <div style="margin-bottom: 20px;">
+                    <h3 style="font-size: 0.95rem; margin-bottom: 10px; color:#0b1a30;">Gerenciar Moradores</h3>
+                    <div id="listaMoradoresConfig" style="margin-bottom: 10px;"></div>
+                    <div style="display: flex; gap: 5px;">
+                        <input type="text" id="txtNovoMorador" placeholder="Nome do integrante" style="margin-bottom:0;">
+                        <button class="btn" onclick="cadastrarMorador()">Adicionar</button>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="font-size: 0.95rem; margin-bottom: 10px; color:#0b1a30;">Cadastrar ou Ajustar Tarefa Fixa</h3>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 5px; margin-bottom: 10px;">
+                        <input type="text" id="cfgNomeTarefa" placeholder="Nome da tarefa (Ex: Limpar vidros)">
+                        <input type="number" id="cfgPontosTarefa" placeholder="Pontos Base">
+                        <select id="cfgFreqTarefa" style="margin-bottom:0;">
+                            <option value="toda">Toda semana</option>
+                            <option value="alternada">15 em 15 dias</option>
+                        </select>
+                    </div>
+                    <button class="btn" style="width: 100%; background-color: #4a5568;" onclick="salvarConfigTarefaCatalogo()">Salvar/Atualizar Tarefa no Modelo</button>
+                </div>
             </div>
 
         </div>
 
         <div class="col-lateral" style="display: flex; flex-direction: column; gap: 20px;">
             
-            <!-- RANKING DO MÊS -->
             <div class="card">
                 <h2>Ranking do Mês</h2>
                 <div id="placarRanking"></div>
             </div>
 
-            <!-- ABA DE MORADORES & RESET -->
-            <div class="card">
-                <h2>Moradores</h2>
-                <div id="listaMoradoresAba" style="margin-bottom: 12px;"></div>
-                <div style="display: flex; gap: 5px; margin-bottom: 15px;">
-                    <input type="text" id="txtNovoMorador" placeholder="Nome" style="margin-bottom: 0;">
-                    <button class="btn" onclick="cadastrarMorador()">Adicionar</button>
-                </div>
-                <button class="btn btn-perigo" style="width:100%; font-size:0.8rem;" onclick="zerarBancoParaUsoOficial()">Zerar Tudo para Modo Oficial</button>
-            </div>
-
-            <!-- ADENDO COMPLETO DE REGRAS E PONTOS -->
             <div class="card">
                 <h2>Regulamento Oficial</h2>
                 <div class="regra-box">
                     <ul>
                         <li><b>Upload Exigido:</b> O sistema bloqueia a submissão se não houver foto provando a limpeza.</li>
                         <li><b>Aprovação por Consenso (Voto Duplo):</b> Uma tarefa necessita do voto de aprovação de <b>pelo menos 2 moradores</b> para computar os pontos. Você nunca pode votar na sua própria tarefa.</li>
-                        <li><b>Cálculo de Agilidade (+15 pts):</b> Concluir a tarefa em até <b>5 dias</b> do ciclo (de quarta até segunda à noite). Se a tarefa for aprovada, o bônus de 15 pontos é somado aos pontos base da tabela.</li>
+                        <li><b>Cálculo de Agilidade (+15 pts):</b> Concluir a tarefa em até <b>5 dias</b> do ciclo (de quarta até segunda à noite). Se a tarefa for aprovada por consenso, o bônus de 15 pontos é somado automaticamente.</li>
                         <li><b>Punição Antiacúmulo:</b> Ficar 2 semanas seguidas sem concluir nada limpa os pontos da sua última tarefa feita no mês corrente.</li>
                     </ul>
                     <table class="tabela-regras">
                         <thead>
                             <tr><th>Tarefa Fixa</th><th>Base</th><th>Com Agilidade</th><th>Freq.</th></tr>
                         </thead>
-                        <tbody>
-                            <tr><td>Limpar Cozinha</td><td>35 pts</td><td style="color:#2db360; font-weight: 600;">50 pts</td><td>Toda semana</td></tr>
-                            <tr><td>Tirar Lixos</td><td>30 pts</td><td style="color:#2db360; font-weight: 600;">45 pts</td><td>Toda semana</td></tr>
-                            <tr><td>Passar Aspirador/Varrer</td><td>30 pts</td><td style="color:#2db360; font-weight: 600;">45 pts</td><td>Toda semana</td></tr>
-                            <tr><td>Lavar Banheiro</td><td>25 pts</td><td style="color:#2db360; font-weight: 600;">40 pts</td><td>Toda semana</td></tr>
-                            <tr><td>Lavar Panos/Toalhas</td><td>30 pts</td><td style="color:#2db360; font-weight: 600;">45 pts</td><td>15 em 15 dias</td></tr>
-                            <tr><td>Limpar Sacada</td><td>20 pts</td><td style="color:#2db360; font-weight: 600;">35 pts</td><td>15 em 15 dias</td></tr>
-                            <tr><td>Mesa TV/Jantar</td><td>15 pts</td><td style="color:#2db360; font-weight: 600;">30 pts</td><td>15 em 15 dias</td></tr>
-                            <tr><td style="color:#b7791f">Tarefa Manual Extra</td><td>10 pts</td><td style="color:#b7791f">Não tem</td><td>Avulsa</td></tr>
-                        </tbody>
+                        <tbody id="corpoTabelaRegras">
+                            </tbody>
                     </table>
                 </div>
+                <button class="btn btn-perigo" style="width:100%; font-size:0.8rem; margin-top:15px;" onclick="zerarBancoParaUsoOficial()">Zerar Tudo para Modo Oficial</button>
             </div>
 
         </div>
 
     </div>
 
-    <!-- MODAL DE INSPEÇÃO -->
     <div class="modal-overlay" id="modalFotoOverlay">
         <div class="modal-content">
             <h3>Inspeção de Comprovação</h3>
@@ -384,7 +381,25 @@
         </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
     <script>
+        // CONFIGURAÇÃO REAL DO SEU BANCO DO FIREBASE (ATUALIZADA)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCcMGpAGObdMB7t6TWCvnLJnpZKMsUsRtA",
+            authDomain: "tarefas-2a8f5.firebaseapp.com",
+            databaseURL: "https://tarefas-2a8f5-default-rtdb.firebaseio.com",
+            projectId: "tarefas-2a8f5",
+            storageBucket: "tarefas-2a8f5.firebasestorage.app",
+            messagingSenderId: "64866675028",
+            appId: "1:64866675028:web:a177d2ad16746e049fc0c1"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Estrutura mestre de inicialização
         let dadosApp = {
             moradores: ["Gustavo", "Rodrigo", "Danilo"],
             pontos: { "Gustavo": 0, "Rodrigo": 0, "Danilo": 0 },
@@ -394,57 +409,44 @@
             tarefasFixasSemana: [],
             escalaAnterior: {},
             usuarioLogado: "Gustavo",
-            ultimaViradaMes: new Date().getMonth()
+            ultimaViradaMes: new Date().getMonth(),
+            catalogoTarefas: [
+                { id: "cozinha", nome: "Limpar Cozinha (Chão e Eletros)", pontos: 35, frequencia: "toda" },
+                { id: "lixo", nome: "Tirar Lixos e levar na lixeira", pontos: 30, frequencia: "toda" },
+                { id: "aspirador", nome: "Passar Aspirador / Varrer a Sala", pontos: 30, frequencia: "toda" },
+                { id: "banheiro", nome: "Lavar o Banheiro", pontos: 25, frequencia: "toda" },
+                { id: "panos", nome: "Lavar Panos de Prato e Toalhas", pontos: 30, frequencia: "alternada" },
+                { id: "sacada", nome: "Limpar a Sacada", pontos: 20, frequencia: "alternada" },
+                { id: "mesatv", nome: "Passar Pano na Mesa da TV / Jantar", pontos: 15, frequencia: "alternada" }
+            ],
+            controleAlternancia: true
         };
 
-        const CATALOGO_FIXAS = [
-            { id: "cozinha", nome: "Limpar Cozinha (Chão e Eletros)", pontos: 35, frequencia: "toda" },
-            { id: "lixo", nome: "Tirar Lixos e levar na lixeira", pontos: 30, frequencia: "toda" },
-            { id: "aspirador", nome: "Passar Aspirador / Varrer a Sala", pontos: 30, frequencia: "toda" },
-            { id: "banheiro", nome: "Lavar o Banheiro", pontos: 25, frequencia: "toda" },
-            { id: "panos", nome: "Lavar Panos de Prato e Toalhas", pontos: 30, frequencia: "alternada" },
-            { id: "sacada", nome: "Limpar a Sacada", pontos: 20, frequencia: "alternada" },
-            { id: "mesatv", nome: "Passar Pano na Mesa da TV / Jantar", pontos: 15, frequencia: "alternada" }
-        ];
-
-        let controleAlternancia = true;
-
-        window.onload = function() {
-            if (localStorage.getItem("dadosRepMilw")) {
-                dadosApp = JSON.parse(localStorage.getItem("dadosRepMilw"));
+        // Ouvinte em tempo real do Firebase
+        db.ref("dadosApartamento").on("value", (snapshot) => {
+            let dadosNuvem = snapshot.val();
+            if (dadosNuvem) {
+                dadosApp = dadosNuvem;
+            } else {
+                db.ref("dadosApartamento").set(dadosApp);
             }
-            
-            let mesAtual = new Date().getMonth();
-            if (dadosApp.ultimaViradaMes !== undefined && dadosApp.ultimaViradaMes !== mesAtual) {
-                alert("Ranking mensal fechado! Pontuações zeradas para o novo mês comercial.");
-                for (let morador in dadosApp.pontos) dadosApp.pontos[morador] = 0;
-                dadosApp.ultimaViradaMes = mesAtual;
-                salvarBanco();
-            }
-
-            if (dadosApp.tarefasFixasSemana.length === 0) {
-                gerarNovaEscalaSemanal();
-            }
-
-            document.getElementById("txtMuralAcordos").value = dadosApp.muralTexto || "";
             atualizarInterfaceCompleta();
-        };
+        });
 
-        function salvarBanco() {
-            localStorage.setItem("dadosRepMilw", JSON.stringify(dadosApp));
+        function sincronizarNuvem() {
+            db.ref("dadosApartamento").update(dadosApp);
         }
 
         function alterarUsuarioAtivo() {
             dadosApp.usuarioLogado = document.getElementById("selectUsuarioLogado").value;
-            salvarBanco();
-            atualizarInterfaceCompleta();
+            sincronizarNuvem();
         }
 
         function atualizarInterfaceCompleta() {
             // 1. Ranking Geral
             let placar = document.getElementById("placarRanking");
             placar.innerHTML = "";
-            let ordenados = Object.keys(dadosApp.pontos).sort((a,b) => dadosApp.pontos[b] - dadosApp.pontos[a]);
+            let ordenados = Object.keys(dadosApp.pontos || {}).sort((a,b) => dadosApp.pontos[b] - dadosApp.pontos[a]);
             ordenados.forEach(nome => {
                 placar.innerHTML += `
                     <div class="ranking-item">
@@ -455,34 +457,51 @@
 
             // 2. Aba de Moradores
             let containerMoradores = document.getElementById("listaMoradoresAba");
+            let containerConfigMoradores = document.getElementById("listaMoradoresConfig");
             containerMoradores.innerHTML = "";
-            dadosApp.moradores.forEach(nome => {
-                containerMoradores.innerHTML += `
+            containerConfigMoradores.innerHTML = "";
+            (dadosApp.moradores || []).forEach(nome => {
+                let blocoEl = `
                     <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:6px 12px; margin-bottom:5px; border-radius:6px; font-size:0.9rem; border: 1px solid #e2e8f0;">
                         <span>${nome}</span>
                         <button class="btn btn-perigo" style="padding:2px 8px; font-size:0.7rem;" onclick="removerMorador('${nome}')">Remover</button>
                     </div>`;
+                containerMoradores.innerHTML += blocoEl;
+                containerConfigMoradores.innerHTML += blocoEl;
             });
 
             // 3. Dropdown de Perfil
             let selectU = document.getElementById("selectUsuarioLogado");
             let usuarioAnterior = dadosApp.usuarioLogado;
             selectU.innerHTML = "";
-            dadosApp.moradores.forEach(nome => {
+            (dadosApp.moradores || []).forEach(nome => {
                 selectU.innerHTML += `<option value="${nome}">${nome}</option>`;
             });
-            if(dadosApp.moradores.includes(usuarioAnterior)) {
+            if((dadosApp.moradores || []).includes(usuarioAnterior)) {
                 selectU.value = usuarioAnterior;
                 dadosApp.usuarioLogado = usuarioAnterior;
             } else {
-                dadosApp.usuarioLogado = dadosApp.moradores[0] || "";
+                dadosApp.usuarioLogado = dadosApp.moradores ? dadosApp.moradores[0] : "";
             }
 
-            // 4. OBRIGAÇÕES EXCLUSIVAS DO PERFIL
+            // 4. Tabela de Regulamento Dinâmico
+            let corpoTabela = document.getElementById("corpoTabelaRegras");
+            corpoTabela.innerHTML = "";
+            (dadosApp.catalogoTarefas || []).forEach(t => {
+                corpoTabela.innerHTML += `
+                    <tr>
+                        <td>${t.nome}</td>
+                        <td>${t.pontos} pts</td>
+                        <td style="color:#2db360; font-weight:600;">${t.pontos + 15} pts</td>
+                        <td>${t.frequencia === 'toda' ? 'Toda semana' : '15 em 15 dias'}</td>
+                    </tr>`;
+            });
+            corpoTabela.innerHTML += `<tr><td style="color:#b7791f">Tarefa Manual Extra</td><td>10 pts</td><td style="color:#b7791f">Não tem</td><td>Avulsa</td></tr>`;
+
+            // 5. OBRIGAÇÕES EXCLUSIVAS DO PERFIL
             let containerTarefas = document.getElementById("listaTarefasSemana");
             containerTarefas.innerHTML = "";
-
-            let minhasObrigacoes = dadosApp.tarefasFixasSemana.filter(t => t.responsavel === dadosApp.usuarioLogado);
+            let minhasObrigacoes = (dadosApp.tarefasFixasSemana || []).filter(t => t.responsavel === dadosApp.usuarioLogado);
 
             if(minhasObrigacoes.length === 0) {
                 containerTarefas.innerHTML = `<span style="color:#718096; font-size:0.85rem; font-style: italic;">Nenhuma obrigação fixa escalada para você esta semana.</span>`;
@@ -495,7 +514,8 @@
                 if (tf.status === "concluida") {
                     interacaoGrid = `<button class="btn btn-status">Aprovado por Geral</button>`;
                 } else if (tf.status === "analise") {
-                    interacaoGrid = `<span style="color:#b7791f; font-size:0.85rem; font-weight:600;">Enviada (${tf.votosAprovados.length}/2 votos). Aguardando aprovação...</span>`;
+                    let numVotos = tf.votosAprovados ? tf.votosAprovados.length : 0;
+                    interacaoGrid = `<span style="color:#b7791f; font-size:0.85rem; font-weight:600;">Enviada (${numVotos}/2 votos). Aguardando aprovação...</span>`;
                 } else {
                     interacaoGrid = `
                         <div style="display:flex; flex-direction:column; gap:8px; width:100%;">
@@ -521,11 +541,10 @@
                     </div>`;
             });
 
-            // 5. FILA DE APROVAÇÕES DOS OUTROS INTEGRANTES
+            // 6. FILA DE APROVAÇÕES DOS OUTROS INTEGRANTES
             let containerAprovacoes = document.getElementById("listaAprovacoesPendentes");
             containerAprovacoes.innerHTML = "";
-
-            let filaParaVotar = dadosApp.tarefasFixasSemana.filter(t => t.status === "analise" && t.responsavel !== dadosApp.usuarioLogado);
+            let filaParaVotar = (dadosApp.tarefasFixasSemana || []).filter(t => t.status === "analise" && t.responsavel !== dadosApp.usuarioLogado);
 
             if (filaParaVotar.length === 0) {
                 containerAprovacoes.innerHTML = `<span style="color:#718096; font-size:0.85rem; font-style:italic;">Nenhuma tarefa pendente de auditoria por você. Tudo limpo!</span>`;
@@ -533,8 +552,9 @@
 
             filaParaVotar.forEach((tf) => {
                 let indexGlobal = dadosApp.tarefasFixasSemana.findIndex(globalT => globalT.id === tf.id);
+                if (!tf.votosAprovados) tf.votosAprovados = [];
                 let jaVotou = tf.votosAprovados.includes(dadosApp.usuarioLogado);
-                let blocoVotosText = `<span style="color:#b7791f; font-size:0.8rem; font-weight:600;">Votos recebidos: ${tf.votosAprovados.length}/2</span>`;
+                let numVotos = tf.votosAprovados.length;
 
                 containerAprovacoes.innerHTML += `
                     <div class="tarefa-box" style="border-left: 4px solid #b7791f; background-color: #fcf8f2;">
@@ -545,9 +565,9 @@
                         <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
                              <img src="${tf.foto}" style="width:70px; height:70px; object-fit:cover; border-radius:4px; border:1px solid #cbd5e0;">
                              <button class="btn btn-lupa" onclick="abrirModalFoto('${tf.foto}')">Inspecionar Foto</button>
-                             ${blocoVotosText}
+                             <span style="color:#b7791f; font-size:0.8rem; font-weight:600;">Votos recebidos: ${numVotos}/2</span>
                         </div>
-                        <div class="tarefa-footer" style="border-top: 1px dashed #e2e8f0;">
+                        <div class="tarefa-footer" style="border-top: 1px solid #e2e8f0;">
                             <span class="pts-badge" style="color:#b7791f; background-color:rgba(183,121,31,0.1)">Vale: ${tf.pontosBase} Pts</span>
                             <div style="display:flex; gap:5px;">
                                 ${jaVotou ? `<span style="color:#718096; font-size:0.8rem; font-style:italic; padding:6px;">Você já votou</span>` : `
@@ -557,14 +577,38 @@
                         </div>
                     </div>`;
             });
+            
+            document.getElementById("txtMuralAcordos").value = dadosApp.muralTexto || "";
+        }
 
-            salvarBanco();
+        function salvarConfigTarefaCatalogo() {
+            let nome = document.getElementById("cfgNomeTarefa").value.trim();
+            let pontos = parseInt(document.getElementById("cfgPontosTarefa").value);
+            let freq = document.getElementById("cfgFreqTarefa").value;
+
+            if(!nome || isNaN(pontos)) return alert("Preencha todos os campos para cadastrar/editar a tarefa.");
+
+            let idGerado = nome.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+            if(!dadosApp.catalogoTarefas) dadosApp.catalogoTarefas = [];
+            let indexExistente = dadosApp.catalogoTarefas.findIndex(t => t.id === idGerado);
+            if(indexExistente > -1) {
+                dadosApp.catalogoTarefas[indexExistente] = { id: idGerado, nome: nome, pontos: pontos, frequencia: freq };
+            } else {
+                dadosApp.catalogoTarefas.push({ id: idGerado, nome: nome, pontos: pontos, frequencia: freq });
+            }
+
+            document.getElementById("cfgNomeTarefa").value = "";
+            document.getElementById("cfgPontosTarefa").value = "";
+            
+            alert("Modelo de tarefa atualizado no catálogo!");
+            sincronizarNuvem();
         }
 
         function gerarNovaEscalaSemanal() {
-            if (dadosApp.moradores.length === 0) return;
-            let ativasDaVez = CATALOGO_FIXAS.filter(t => t.frequencia === "toda" || controleAlternancia);
-            controleAlternancia = !controleAlternancia;
+            if (!dadosApp.moradores || dadosApp.moradores.length === 0) return;
+            let ativasDaVez = dadosApp.catalogoTarefas.filter(t => t.frequencia === "toda" || dadosApp.controleAlternancia);
+            dadosApp.controleAlternancia = !dadosApp.controleAlternancia;
             
             let novaLista = [];
             let moradoresDisponiveis = [...dadosApp.moradores];
@@ -585,7 +629,7 @@
                     responsavel: resp,
                     status: "pendente",
                     foto: null,
-                    votosAprovados: [], 
+                    votosAprovados: [],
                     dataGerada: new Date().getTime()
                 });
                 indiceMorador++;
@@ -595,24 +639,22 @@
 
         function submeterTarefaParaAnalise(index) {
             let fileInput = document.getElementById(`fileFixa_${index}`);
-            if (!fileInput.files || fileInput.files.length === 0) {
-                alert("Você precisa anexar a imagem provando que realizou a faxina!");
-                return;
-            }
+            if (!fileInput.files || fileInput.files.length === 0) return alert("Você precisa anexar a imagem provando que realizou a faxina!");
 
             let reader = new FileReader();
             reader.onload = function() {
                 dadosApp.tarefasFixasSemana[index].foto = reader.result;
                 dadosApp.tarefasFixasSemana[index].status = "analise";
                 dadosApp.tarefasFixasSemana[index].votosAprovados = [];
-                alert("Sua obrigação foi enviada. Agora pelo menos 2 moradores precisam entrar e votar para aprovar!");
-                atualizarInterfaceCompleta();
+                alert("Sua obrigação foi enviada. Agora os outros moradores precisam votar para aprovar!");
+                sincronizarNuvem();
             };
             reader.readAsDataURL(fileInput.files[0]);
         }
 
         function votarAprovarTarefa(index) {
             let t = dadosApp.tarefasFixasSemana[index];
+            if (!t.votosAprovados) t.votosAprovados = [];
             if (t.votosAprovados.includes(dadosApp.usuarioLogado)) return;
 
             t.votosAprovados.push(dadosApp.usuarioLogado);
@@ -620,32 +662,29 @@
             if (t.votosAprovados.length >= 2) {
                 let agora = new Date();
                 let diffDias = Math.ceil(Math.abs(agora - new Date(t.dataGerada)) / (1000 * 60 * 60 * 24));
-
                 let pontosFinais = t.pontosBase;
                 if (diffDias <= 5) pontosFinais += 15;
 
                 dadosApp.pontos[t.responsavel] = (dadosApp.pontos[t.responsavel] || 0) + pontosFinais;
                 t.status = "concluida";
+                if(!dadosApp.ultimaTarefaFeita) dadosApp.ultimaTarefaFeita = {};
                 dadosApp.ultimaTarefaFeita[t.responsavel] = { id: t.id_base, pontos: pontosFinais };
 
-                alert(`Segundo voto computado. A tarefa de ${t.responsavel} foi validada por consenso!`);
+                alert(`Segundo voto computado! A tarefa de ${t.responsavel} foi validada por consenso!`);
             } else {
                 alert(`Voto registrado! A tarefa de ${t.responsavel} agora tem (1/2) votos.`);
             }
-
-            atualizarInterfaceCompleta();
+            sincronizarNuvem();
         }
 
         function rejeitarTarefaFixa(index) {
             let t = dadosApp.tarefasFixasSemana[index];
-            let motivo = prompt(`Por que a tarefa de ${t.responsavel} está sendo rejeitada?:`);
-            
+            prompt(`Por que a tarefa de ${t.responsavel} está sendo rejeitada?:`);
             t.status = "pendente";
             t.foto = null; 
             t.votosAprovados = [];
-
             alert(`Tarefa retornou para o painel de obrigações de ${t.responsavel} para ser refeita.`);
-            atualizarInterfaceCompleta();
+            sincronizarNuvem();
         }
 
         function salvarTarefaManual() {
@@ -653,11 +692,12 @@
             let descricao = document.getElementById("txtManualTarefa").value.trim();
             let fileInput = document.getElementById("fileManual");
 
-            if (!descricao) { return alert("Descreva a tarefa manual realizada."); }
-            if (fileInput.files.length === 0) { return alert("Upload de comprovante visual obrigatório."); }
+            if (!descricao) return alert("Descreva a tarefa manual realizada.");
+            if (fileInput.files.length === 0) return alert("Upload de comprovante visual obrigatório.");
 
             let reader = new FileReader();
             reader.onload = function() {
+                if(!dadosApp.tarefasFixasSemana) dadosApp.tarefasFixasSemana = [];
                 dadosApp.tarefasFixasSemana.push({
                     id: "manual_" + new Date().getTime(),
                     id_base: "manual",
@@ -673,9 +713,8 @@
                 document.getElementById("txtManualTarefa").value = "";
                 document.getElementById("previewManual").innerHTML = "Nenhuma imagem carregada";
                 document.getElementById("fileManual").value = "";
-                
-                alert("Tarefa avulsa enviada! Ela também precisará de 2 aprovações dos meninos.");
-                atualizarInterfaceCompleta();
+                alert("Tarefa avulsa enviada! Ela precisará de 2 aprovações.");
+                sincronizarNuvem();
             };
             reader.readAsDataURL(fileInput.files[0]);
         }
@@ -687,7 +726,7 @@
                 let fezAlgo = dadosApp.tarefasFixasSemana.some(t => t.responsavel === m && t.status === "concluida");
                 if (!fezAlgo) {
                     dadosApp.historicoSemanasSemFazer[m] = (dadosApp.historicoSemanasSemFazer[m] || 0) + 1;
-                    if (dadosApp.historicoSemanasSemFazer[m] >= 2 && dadosApp.ultimaTarefaFeita[m]) {
+                    if (dadosApp.historicoSemanasSemFazer[m] >= 2 && dadosApp.ultimaTarefaFeita && dadosApp.ultimaTarefaFeita[m]) {
                         let pts = dadosApp.ultimaTarefaFeita[m].pontos;
                         dadosApp.pontos[m] = Math.max(0, dadosApp.pontos[m] - pts);
                         alert(`PUNIÇÃO: ${m} está há 2 semanas sem trabalhar! Perdeu -${pts} Pts da última tarefa.`);
@@ -700,16 +739,7 @@
             dadosApp.tarefasFixasSemana.forEach(t => { if(t.status === "concluida") dadosApp.escalaAnterior[t.responsavel] = t.id_base; });
 
             gerarNovaEscalaSemanal();
-            atualizarInterfaceCompleta();
-        }
-
-        function abrirModalFoto(src) {
-            document.getElementById("modalFotoImg").src = src;
-            document.getElementById("modalFotoOverlay").style.display = "flex";
-        }
-
-        function fecharModalFoto() {
-            document.getElementById("modalFotoOverlay").style.display = "none";
+            sincronizarNuvem();
         }
 
         function cadastrarMorador() {
@@ -719,40 +749,31 @@
             dadosApp.pontos[nome] = 0;
             dadosApp.historicoSemanasSemFazer[nome] = 0;
             document.getElementById("txtNovoMorador").value = "";
-            atualizarInterfaceCompleta();
+            sincronizarNuvem();
         }
 
         function removerMorador(nome) {
             if (!confirm(`Remover ${nome}?`)) return;
             dadosApp.moradores = dadosApp.moradores.filter(m => m !== nome);
             delete dadosApp.pontos[nome];
-            atualizarInterfaceCompleta();
+            sincronizarNuvem();
         }
 
-        function zerarBancoParaUsoOficial() {
-            if (!confirm("Deseja apagar o histórico de simulação e iniciar valendo?")) return;
-            localStorage.removeItem("dadosRepMilw");
-            dadosApp = {
-                moradores: ["Gustavo", "Rodrigo", "Danilo"],
-                pontos: { "Gustavo": 0, "Rodrigo": 0, "Danilo": 0 },
-                historicoSemanasSemFazer: { "Gustavo": 0, "Rodrigo": 0, "Danilo": 0 },
-                ultimaTarefaFeita: {},
-                muralTexto: "",
-                tarefasFixasSemana: [],
-                escalaAnterior: {},
-                usuarioLogado: "Gustavo",
-                ultimaViradaMes: new Date().getMonth()
-            };
-            gerarNovaEscalaSemanal();
-            atualizarInterfaceCompleta();
-            alert("Aplicativo reiniciado em modo oficial! Que vença o melhor faxineiro.");
+        function abrirModalFoto(src) {
+            document.getElementById("modalFotoImg").src = src;
+            document.getElementById("modalFotoOverlay").style.display = "flex";
         }
-
-        function salvarMural() { dadosApp.muralTexto = document.getElementById("txtMuralAcordos").value; salvarBanco(); }
+        function fecharModalFoto() { document.getElementById("modalFotoOverlay").style.display = "none"; }
+        function salvarMural() { dadosApp.muralTexto = document.getElementById("txtMuralAcordos").value; sincronizarNuvem(); }
         function verFotoManual(event) {
             let reader = new FileReader();
             reader.onload = function() { document.getElementById('previewManual').innerHTML = `<img src="${reader.result}">`; }
             reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function zerarBancoParaUsoOficial() {
+            if (!confirm("Deseja resetar a base na nuvem e iniciar valendo o jogo oficial?")) return;
+            db.ref("dadosApartamento").set(null); 
         }
     </script>
 </body>
