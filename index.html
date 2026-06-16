@@ -21,21 +21,21 @@
         header {
             background-color: #ffffff;
             border-bottom: 1px solid #dbe2e9;
-            padding: 15px;
+            padding: 20px;
             text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         header h1 {
             color: #0b1a30;
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             font-weight: 600;
             letter-spacing: -0.5px;
         }
 
-        /* BANNER DE SELEÇÃO DE PERFIL */
         .login-banner {
             background-color: #e9f0f8;
-            padding: 10px;
+            padding: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -44,24 +44,24 @@
         }
 
         .login-banner span {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: #4a5568;
             font-weight: 500;
         }
 
         .login-banner select {
             width: auto;
-            padding: 4px 12px;
+            margin-bottom: 0;
+            padding: 6px 16px;
             background-color: #ffffff;
             color: #0066cc;
             font-weight: 600;
             border: 1px solid #0066cc;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.85rem;
         }
 
-        /* MENU DE NAVEGAÇÃO POR ABAS (CLEAN) */
+        /* MENU SUPERIOR CLEAN */
         .nav-tabs {
             display: flex;
             justify-content: center;
@@ -82,9 +82,7 @@
             white-space: nowrap;
         }
 
-        .tab-link:hover {
-            color: #0066cc;
-        }
+        .tab-link:hover { color: #0066cc; }
 
         .tab-link.active {
             color: #0066cc;
@@ -92,14 +90,8 @@
             border-bottom: 2px solid #0066cc;
         }
 
-        /* CONTEÚDO DAS ABAS */
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
         .container {
             max-width: 800px;
@@ -119,7 +111,7 @@
         }
 
         .card h2 {
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             color: #0b1a30;
             font-weight: 600;
             margin-bottom: 15px;
@@ -203,10 +195,14 @@
         .btn:hover { background-color: #0052cc; }
         .btn-concluir { background-color: #0066cc; color: #ffffff; }
         .btn-aprovar { background-color: #2db360; color: #ffffff; font-size: 0.8rem; padding: 6px 12px; }
+        .btn-aprovar:hover { background-color: #249e4c; }
         .btn-rejeitar { background-color: #e53e3e; color: #ffffff; font-size: 0.8rem; padding: 6px 12px; }
+        .btn-rejeitar:hover { background-color: #c53030; }
         .btn-status { background-color: #edf2f7; color: #718096; cursor: default; font-size: 0.8rem; border: 1px solid #e2e8f0; }
         .btn-perigo { background-color: #e53e3e; color: #ffffff; }
+        .btn-perigo:hover { background-color: #c53030; }
         .btn-lupa { background-color: #4a5568; color: #ffffff; font-size: 0.8rem; padding: 6px 12px; }
+        .btn-lupa:hover { background-color: #2d3748; }
 
         input, textarea, select {
             width: 100%;
@@ -280,6 +276,7 @@
             box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
             text-align: center;
         }
+        .modal-content h3 { font-size: 1.1rem; color: #0b1a30; margin-bottom: 12px; }
         .modal-content img {
             max-width: 100%;
             max-height: 50vh;
@@ -293,7 +290,7 @@
 <body>
 
     <header>
-        <h1>Gestão de Tarefas Domésticas v4</h1>
+        <h1>Gestão de Tarefas Domésticas</h1>
     </header>
 
     <div class="login-banner">
@@ -305,7 +302,7 @@
         <button class="tab-link active" onclick="alternarAba(event, 'aba-obrigacoes')">Minhas Obrigações</button>
         <button class="tab-link" onclick="alternarAba(event, 'aba-votos')">Central de Votos</button>
         <button class="tab-link" onclick="alternarAba(event, 'aba-ranking')">Placar & Mural</button>
-        <button class="tab-link" onclick="alternarAba(event, 'aba-config')">Configurações</button>
+        <button class="tab-link" onclick="alternarAba(event, 'aba-config')">Configurações e Regras</button>
     </nav>
 
     <div class="container">
@@ -315,14 +312,7 @@
                 <h2>Obrigações da Semana <button class="btn" style="font-size: 0.75rem; padding: 5px 10px;" onclick="virarSemanaOficial()">Virar Ciclo (Quarta)</button></h2>
                 <div id="listaTarefasSemana"></div>
             </div>
-        </div>
 
-        <div id="aba-votos" class="tab-content">
-            <div class="card" style="border-top: 3px solid #dd6b20;">
-                <h2 style="color: #b7791f;">Aprovações Pendentes</h2>
-                <div id="listaAprovacoesPendentes"></div>
-            </div>
-            
             <div class="card" style="margin-top: 20px;">
                 <h2>Registrar Tarefa Manual Extra (10 Pts)</h2>
                 <div>
@@ -333,6 +323,13 @@
                 <input type="file" id="fileManual" accept="image/*" onchange="verFotoManual(event)">
                 <div class="preview-foto" id="previewManual">Nenhuma imagem carregada</div>
                 <button class="btn" style="width: 100%;" onclick="salvarTarefaManual()">Enviar para Fila de Votos</button>
+            </div>
+        </div>
+
+        <div id="aba-votos" class="tab-content">
+            <div class="card" style="border-top: 3px solid #dd6b20;">
+                <h2 style="color: #b7791f;">Aprovações Pendentes</h2>
+                <div id="listaAprovacoesPendentes"></div>
             </div>
         </div>
 
@@ -375,8 +372,9 @@
                 <h2>Regulamento e Estrutura de Pontos</h2>
                 <div class="regra-box">
                     <ul>
-                        <li><b>Aprovação por Consenso (Voto Duplo):</b> Toda tarefa necessita da validação de <b>pelo menos 2 moradores</b>. Você nunca vota no seu próprio painel.</li>
-                        <li><b>Inatividade:</b> Ficar 2 semanas sem concluir tarefas fixas deleta os pontos da sua última faxina aprovada.</li>
+                        <li><b>Upload Exigido:</b> O sistema bloqueia a submissão se não houver foto provando a limpeza.</li>
+                        <li><b>Aprovação por Consenso (Voto Duplo):</b> Toda tarefa necessita da validação de <b>pelo menos 2 moradores</b> para computar os pontos. Você nunca vota no seu próprio painel.</li>
+                        <li><b>Punição Antiacúmulo:</b> Ficar 2 semanas sem concluir tarefas fixas deleta os pontos da sua última faxina aprovada.</li>
                     </ul>
                     <table class="tabela-regras">
                         <thead>
@@ -439,7 +437,6 @@
             controleAlternancia: true
         };
 
-        // Lógica de Alternância de Abas (Menu)
         function alternarAba(event, abaId) {
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             document.querySelectorAll('.tab-link').forEach(tab => tab.classList.remove('active'));
@@ -448,7 +445,6 @@
             event.currentTarget.classList.add('active');
         }
 
-        // Firebase Reativo
         db.ref("dadosApartamento").on("value", (snapshot) => {
             let dadosNuvem = snapshot.val();
             if (dadosNuvem) {
@@ -471,7 +467,6 @@
         }
 
         function atualizarInterfaceCompleta() {
-            // 1. Dropdown do Banner de Perfil
             let selectU = document.getElementById("selectUsuarioLogado");
             let usuarioAnterior = dadosApp.usuarioLogado;
             selectU.innerHTML = "";
@@ -489,7 +484,6 @@
                 }
             }
 
-            // 2. Ranking Geral
             let placar = document.getElementById("placarRanking");
             placar.innerHTML = "";
             let ordenados = Object.keys(dadosApp.pontos || {}).sort((a,b) => dadosApp.pontos[b] - dadosApp.pontos[a]);
@@ -501,7 +495,6 @@
                     </div>`;
             });
 
-            // 3. Listagem CRUD de Moradores na Configuração
             let containerConfigMoradores = document.getElementById("listaMoradoresConfig");
             containerConfigMoradores.innerHTML = "";
             (dadosApp.moradores || []).forEach(nome => {
@@ -512,7 +505,6 @@
                     </div>`;
             });
 
-            // 4. Tabela de Regulamento Dinâmico
             let corpoTabela = document.getElementById("corpoTabelaRegras");
             corpoTabela.innerHTML = "";
             (dadosApp.catalogoTarefas || []).forEach(t => {
@@ -525,7 +517,6 @@
             });
             corpoTabela.innerHTML += `<tr><td style="color:#b7791f">Tarefa Manual Extra</td><td>10 pts</td><td>Avulsa</td></tr>`;
 
-            // 5. OBRIGAÇÕES DO PERFIL (DISTRIBUIÇÃO RANDÔMICA)
             let containerTarefas = document.getElementById("listaTarefasSemana");
             containerTarefas.innerHTML = "";
             let minhasObrigacoes = (dadosApp.tarefasFixasSemana || []).filter(t => t.responsavel === dadosApp.usuarioLogado);
@@ -568,7 +559,6 @@
                     </div>`;
             });
 
-            // 6. FILA DE APROVAÇÕES DOS OUTROS INTEGRANTES
             let containerAprovacoes = document.getElementById("listaAprovacoesPendentes");
             containerAprovacoes.innerHTML = "";
             let filaParaVotar = (dadosApp.tarefasFixasSemana || []).filter(t => t.status === "analise" && t.responsavel !== dadosApp.usuarioLogado);
@@ -592,7 +582,7 @@
                         <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
                              <img src="${tf.foto}" style="width:70px; height:70px; object-fit:cover; border-radius:4px; border:1px solid #cbd5e0;">
                              <button class="btn btn-lupa" onclick="abrirModalFoto('${tf.foto}')">Inspecionar Foto</button>
-                             <span style="color:#b7791f; font-size:0.8rem; font-weight:600;">Votos: ${numVotos}/2</span>
+                             <span style="color:#b7791f; font-size:0.8rem; font-weight:600;">Votos recebidos: ${numVotos}/2</span>
                         </div>
                         <div class="tarefa-footer" style="border-top: 1px solid #e2e8f0;">
                             <span class="pts-badge" style="color:#b7791f; background-color:rgba(183,121,31,0.1)">Vale: ${tf.pontosBase} Pts</span>
@@ -610,7 +600,7 @@
 
         function salvarConfigTarefaCatalogo() {
             let nome = document.getElementById("cfgNomeTarefa").value.trim();
-            let pontos = parseInt(document.getElementById("cfgPontosTarefa").value);
+            let pontos = parseInt(document.getElementById("cfgPointsTarefa") ? document.getElementById("cfgPointsTarefa").value : document.getElementById("cfgPontosTarefa").value);
             let freq = document.getElementById("cfgFreqTarefa").value;
 
             if(!nome || isNaN(pontos)) return alert("Preencha os campos da tarefa.");
@@ -626,44 +616,42 @@
             }
 
             document.getElementById("cfgNomeTarefa").value = "";
-            document.getElementById("cfgPontosTarefa").value = "";
+            if(document.getElementById("cfgPontosTarefa")) document.getElementById("cfgPontosTarefa").value = "";
             
             alert("Tarefa salva no catálogo!");
             sincronizarNuvem();
         }
 
-        function submeterTarefaParaAnalise(index) {
-            let fileInput = document.getElementById(`fileFixa_${index}`);
-            if (!fileInput.files || fileInput.files.length === 0) return alert("Você precisa anexar a imagem provando que realizou a faxina!");
+        function gerarNovaEscalaSemanal() {
+            if (!dadosApp.moradores || dadosApp.moradores.length === 0) return;
+            let ativasDaVez = dadosApp.catalogoTarefas.filter(t => t.frequencia === "toda" || dadosApp.controleAlternancia);
+            dadosApp.controleAlternancia = !dadosApp.controleAlternancia;
+            
+            let novaLista = [];
+            let moradoresDisponiveis = [...dadosApp.moradores];
+            let indiceMorador = 0;
 
-            let reader = new FileReader();
-            reader.onload = function() {
-                dadosApp.tarefasFixasSemana[index].foto = reader.result;
-                dadosApp.tarefasFixasSemana[index].status = "analise";
-                dadosApp.tarefasFixasSemana[index].votosAprovados = [];
-                alert("Sua obrigação foi enviada. Aguarde as aprovações!");
-                sincronizarNuvem();
-            };
-            reader.readAsDataURL(fileInput.files[0]);
-        }
+            ativasDaVez.forEach(t => {
+                let resp = moradoresDisponiveis[indiceMorador % moradoresDisponiveis.length];
+                if (dadosApp.escalaAnterior && dadosApp.escalaAnterior[resp] === t.id && moradoresDisponiveis.length > 1) {
+                    indiceMorador++;
+                    resp = moradoresDisponiveis[indiceMorador % moradoresDisponiveis.length];
+                }
 
-        function votarAprovarTarefa(index) {
-            let t = dadosApp.tarefasFixasSemana[index];
-            if (!t.votosAprovados) t.votosAprovados = [];
-            if (t.votosAprovados.includes(dadosApp.usuarioLogado)) return;
-
-            t.votosAprovados.push(dadosApp.usuarioLogado);
-
-            if (t.votosAprovados.length >= 2) {
-                dadosApp.pontos[t.responsavel] = (dadosApp.pontos[t.responsavel] || 0) + t.pointsFinalCalculado;
-                t.status = "concluida";
-                if(!dadosApp.ultimaTarefaFeita) dadosApp.ultimaTarefaFeita = {};
-                dadosApp.ultimaTarefaFeita[t.responsavel] = { id: t.id_base, pontos: t.pointsFinalCalculado };
-                alert(`Tarefa de ${t.responsavel} validada por consenso!`);
-            } else {
-                alert(`Voto registrado! (${t.votosAprovados.length}/2)`);
-            }
-            sincronizarNuvem();
+                novaLista.push({
+                    id: t.id + "_" + new Date().getTime() + "_" + Math.floor(Math.random() * 100),
+                    id_base: t.id,
+                    nome: t.nome,
+                    pontosBase: t.pontos,
+                    responsavel: resp,
+                    status: "pendente",
+                    foto: null,
+                    votosAprovados: [],
+                    dataGerada: new Date().getTime()
+                });
+                indiceMorador++;
+            });
+            dadosApp.tarefasFixasSemana = novaLista;
         }
 
         function submeterTarefaParaAnalise(index) {
@@ -738,7 +726,7 @@
                 document.getElementById("txtManualTarefa").value = "";
                 document.getElementById("previewManual").innerHTML = "Nenhuma imagem carregada";
                 document.getElementById("fileManual").value = "";
-                alert("Tarefa avulsa enviada! Ela também precisará de 2 aprovações.");
+                alert("Tarefa avulsa enviada! Ela precisará de 2 aprovações.");
                 sincronizarNuvem();
             };
             reader.readAsDataURL(fileInput.files[0]);
