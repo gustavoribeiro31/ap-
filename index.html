@@ -3,112 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tarefas da Casa</title>
+    <title>Tarefas do Apê</title>
     <style>
         :root {
-            --bg-color: #e9ecef;
-            --text-color: #2b2b2b;
-            --card-bg: #ffffff;
-            --primary: #3498db;   
-            --secondary: #9b59b6; 
-            --tertiary: #e67e22;  
-            --quaternary: #1abc9c;
+            --bg-color: #f4f4f9;
+            --text-color: #333;
+            --card-bg: #fff;
+            --primary: #4a90e2;
+            --secondary: #8e44ad;
+            --tertiary: #e67e22;
+            --quaternary: #27ae60;
         }
 
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 15px 10px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
         }
-
-        /* --- ESTILOS DO MODO TESTE --- */
-        .painel-teste {
-            background-color: #ffeaa7;
-            border: 2px dashed #fdcb6e;
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            text-align: center;
-            width: 100%;
-            max-width: 400px;
-            box-sizing: border-box;
-        }
-        .painel-teste h3 { margin: 0 0 10px 0; font-size: 1em; color: #d63031; }
-        .botoes-teste { display: flex; justify-content: center; gap: 10px; }
-        .botoes-teste button {
-            padding: 8px 12px;
-            border: none;
-            background: #2d3436;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        /* ----------------------------- */
 
         .header {
             text-align: center;
-            margin-bottom: 15px;
-            width: 100%;
-            max-width: 400px;
+            margin-bottom: 30px;
         }
 
         .header h1 {
-            margin: 0 0 5px 0;
+            margin: 0 0 10px 0;
             color: #2c3e50;
-            font-size: 1.6em;
         }
 
         .cycle-info {
-            background-color: #2c3e50;
-            color: #fff;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.85em;
+            background-color: #e0e6ed;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: #555;
             display: inline-block;
-            font-weight: bold;
         }
 
         .grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 12px;
+            gap: 20px;
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
         }
 
         .card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            border-left: 8px solid #ccc;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 6px solid #ccc;
         }
 
         .card h2 {
-            margin: 0 0 8px 0;
+            margin: 0 0 15px 0;
             font-size: 1.2em;
-            color: #2c3e50;
             display: flex;
             align-items: center;
+            gap: 10px;
         }
 
         .card ul {
             margin: 0;
             padding-left: 20px;
-            font-size: 0.95em;
         }
 
         .card li {
-            margin-bottom: 4px;
-            line-height: 1.3;
+            margin-bottom: 8px;
+            line-height: 1.4;
         }
 
         .card[data-person="Gustavo"] { border-color: var(--primary); }
@@ -121,38 +89,32 @@
             font-weight: bold;
             list-style-type: none;
             margin-left: -20px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        }
+
+        .footer-note {
+            margin-top: 30px;
+            font-size: 0.85em;
+            color: #777;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
-    <!-- PAINEL DE TESTE (Apague essa div antes de mandar pros amigos) -->
-    <div class="painel-teste">
-        <h3>🛠️ MODO MÁQUINA DO TEMPO</h3>
-        <div class="botoes-teste">
-            <button onclick="mudarSemana(-1)">⬅️ Voltar Semana</button>
-            <button onclick="mudarSemana(1)">Avançar Semana ➡️</button>
-        </div>
-    </div>
-    <!-- FIM DO PAINEL DE TESTE -->
-
     <div class="header">
-        <h1>🧹 Escala da Casa</h1>
-        <div class="cycle-info" id="cycle-dates">Carregando...</div>
+        <h1>Tarefas do Apê</h1>
+        <div class="cycle-info" id="cycle-dates">Carregando ciclo...</div>
     </div>
 
     <div class="grid" id="chores-grid">
     </div>
 
+    <div class="footer-note">
+        A escala roda automaticamente toda quarta-feira.
+    </div>
+
     <script>
         const people = ["Gustavo", "Rodrigo", "Danilo", "Beatriz"];
-        const emojis = ["👦🏻", "👦🏽", "👦🏼", "👩🏻"]; 
-        
-        // Variável que controla a "viagem no tempo"
-        let semanasDeDeslocamento = 0;
 
         function getLastWednesday(date) {
             const d = new Date(date);
@@ -167,33 +129,27 @@
             return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
         }
 
-        // Função chamada pelos botões de teste
-        function mudarSemana(quantidade) {
-            semanasDeDeslocamento += quantidade;
-            renderApp();
-        }
-
         function renderApp() {
-            // Pegamos a data de hoje e somamos/subtraimos os dias do teste
             const today = new Date();
-            today.setDate(today.getDate() + (semanasDeDeslocamento * 7));
-
             const lastWednesday = getLastWednesday(today);
             
             const nextWednesday = new Date(lastWednesday);
             nextWednesday.setDate(nextWednesday.getDate() + 7);
 
             document.getElementById('cycle-dates').innerText = 
-                `Validade: ${formatDate(lastWednesday)} até ${formatDate(nextWednesday)}`;
+                `Ciclo atual: ${formatDate(lastWednesday)} até ${formatDate(nextWednesday)}`;
 
             const weekIndex = Math.floor(lastWednesday.getTime() / (7 * 24 * 60 * 60 * 1000));
+
+            // Verifica se a semana é par ou ímpar (semana sim, semana não)
             const isPanosWeek = (weekIndex % 2 === 0);
 
+            // Os blocos são definidos dinamicamente de acordo com a semana
             const choreBlocks = [
-                ["Lavar banheiro 🚽"],
-                ["Limpar cozinha 🧽"],
-                isPanosWeek ? ["Lavar panos de cozinha 🧺", "Lavar panos de chão 🧺"] : ["Folga"],
-                ["Passar aspirador na sala/sacada 🌬️", "Recolher lixos e levar na lixeira 🗑️"]
+                ["Lavar banheiro"],
+                ["Limpar cozinha"],
+                isPanosWeek ? ["Lavar panos de cozinha", "Lavar panos de chão"] : ["<span class='folga'>Semana de folga! 🎉</span>"],
+                ["Passar aspirador na sala/sacada", "Recolher lixos e levar na lixeira"]
             ];
 
             const grid = document.getElementById('chores-grid');
@@ -207,16 +163,10 @@
                 card.className = 'card';
                 card.setAttribute('data-person', person);
 
-                let listHTML = "";
-
-                if (assignedChores[0] === "Folga") {
-                    listHTML = `<li class="folga">🎉 Semana de folga!</li>`;
-                } else {
-                    listHTML = assignedChores.map(chore => `<li>${chore}</li>`).join('');
-                }
+                let listHTML = assignedChores.map(chore => `<li>${chore}</li>`).join('');
 
                 card.innerHTML = `
-                    <h2>${emojis[index]} ${person}</h2>
+                    <h2>${person}</h2>
                     <ul>
                         ${listHTML}
                     </ul>
